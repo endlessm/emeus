@@ -1,0 +1,4 @@
+usr/lib/*/libemeus-*.so
+usr/lib/*/pkgconfig
+usr/include/emeus-*
+usr/share/gir-1.0/Emeus-*.gir
