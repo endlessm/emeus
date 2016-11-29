@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --builddirectory=_build
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+	--prefix=${DEB_PREFIX} \
+	--libdir=${DEB_PREFIX}/lib/$(DEB_HOST_MULTIARCH) \
+	--libexecdir=${DEB_PREFIX}/bin \
+	--mandir=${DEB_PREFIX}/share/man \
+	--includedir=${DEB_PREFIX}/include
+
+override_dh_clean:
+	dh_clean
+	rm -rf _build
