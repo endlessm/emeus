@@ -2,6 +2,7 @@ Source: emeus
 Priority: standard
 Maintainer: Martin Abente Lahaye <martin@endlessm.com>
 Build-Depends: debhelper (>= 8.0.0),
+               gettext,
                gir1.2-glib-2.0,
                gtk-doc-tools (>= 1.18),
                gobject-introspection,
