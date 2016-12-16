@@ -3,3 +3,4 @@ usr/bin/emeus-gen-constraints
 usr/share/applications/com.endlessm.EmeusEditor.desktop
 usr/share/dbus-1/services/*.service
 usr/share/locale/*/LC_MESSAGES/*.mo
+usr/share/icons/hicolor/256x256/apps/*.png
