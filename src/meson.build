@@ -15,7 +15,6 @@ private_headers = [
   'emeus-simplex-solver-private.h',
   'emeus-types-private.h',
   'emeus-utils-private.h',
-  'emeus-variable-private.h',
   'emeus-vfl-parser-private.h',
 ]
 
@@ -23,7 +22,6 @@ solver_sources = [
   'emeus-expression.c',
   'emeus-simplex-solver.c',
   'emeus-utils.c',
-  'emeus-variable.c',
   'emeus-vfl-parser.c',
 ]
 
@@ -63,7 +61,8 @@ libemeus_private = static_library('emeus-private',
 
 libemeus = shared_library('emeus-@0@'.format(emeus_api_version),
                           sources: sources + solver_sources + private_headers,
-                          version: meson.project_version(),
+                          soversion: 0,
+                          version: libversion,
                           install: true,
                           dependencies: [ gtk_dep, mathlib_dep ],
                           c_args: common_cflags + debug_cflags + gtk_version_cflags + [
