@@ -83,62 +83,43 @@ test_cflags = [
   '-Werror=array-bounds',
   '-Werror=write-strings'
 ]
-common_cflags = []
-foreach cflag: test_cflags
-  if cc.has_argument(cflag)
-    common_cflags += [ cflag ]
-  endif
-endforeach
+common_cflags = cc.get_supported_arguments(test_cflags)
 
 # Check for headers
-conf.set('HAVE_STDLIB_H', cc.has_header('stdlib.h'))
-conf.set('HAVE_STDINT_H', cc.has_header('stdint.h'))
-conf.set('HAVE_STDBOOL_H', cc.has_header('stdbool.h'))
+test_headers = [
+  'stdlib.h',
+  'stdint.h',
+  'stdbool.h',
+]
+foreach h: test_headers
+  conf.set('HAVE_' + h.underscorify().to_upper(), cc.has_header(h))
+endforeach
 
 # Debugging
 debug_cflags = []
-enable_debug = get_option('enable-debug')
-if enable_debug == 'auto'
-  if emeus_is_development
-    enable_debug = 'yes'
-  else
-    enable_debug = 'minimum'
-  endif
-endif
+buildtype = get_option('buildtype')
 
-if enable_debug == 'yes'
+if buildtype.startswith('debug')
   debug_cflags += [
     '-DEMEUS_ENABLE_DEBUG'
   ]
-endif
-
-if enable_debug == 'minimum'
+elif buildtype == 'release'
   debug_cflags += [
-    '-DEMEUS_ENABLE_DEBUG',
     '-DG_DISABLE_CAST_CHECKS'
   ]
 endif
 
-if enable_debug == 'no'
-  debug_cflags += [
-    '-DG_DISABLE_CAST_CHECKS',
-    '-DG_DISABLE_CHECKS',
-    '-DG_DISABLE_ASSERT'
-  ]
-endif
 
 # Detect and set symbol visibility
 if get_option('default_library') != 'static'
   if host_system == 'windows'
     conf.set('DLL_EXPORT', true)
-    if cc.get_id() == 'msvc'
-      conf.set('_EMEUS_PUBLIC', '__declspec(dllexport) extern')
-    else
-      conf.set('_EMEUS_PUBLIC', '__attribute__((visibility("default"))) __declspec(dllexport) extern')
+    conf.set('_EMEUS_PUBLIC', '__declspec(dllexport) extern')
+    if cc.get_id() != 'msvc'
       add_global_arguments('-fvisibility=hidden', language: 'c')
     endif
   else
-    conf.set('_EMEUS_PUBLIC', '__attribute__((visibility("default")))')
+    conf.set('_EMEUS_PUBLIC', '__attribute__((visibility("default"))) extern')
     add_global_arguments('-fvisibility=hidden', language: 'c')
   endif
 endif
@@ -166,15 +147,17 @@ endif
 
 gtk_dep = dependency('gtk+-3.0', version: '>= ' + gtk_version_required)
 
-find_program('msgmerge')
-
 gnome = import('gnome')
+i18n = import('i18n')
+
+podir = join_paths(meson.current_source_dir(), 'po')
 
 subdir('src')
 subdir('examples')
-
 subdir('po')
 
-if get_option('enable-gtk-doc')
+if get_option('gtk_doc')
   subdir('doc')
 endif
+
+meson.add_install_script('build-aux/post-install.sh')
